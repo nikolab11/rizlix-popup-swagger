@@ -107,6 +107,7 @@
     "url-parse": "^1.5.10",
     "xml": "=1.0.1",
     "xml-but-prettier": "^1.0.1",
+    "yamljs": "=0.3.0",
     "zenscroll": "^4.0.2"
   },
   "devDependencies": {

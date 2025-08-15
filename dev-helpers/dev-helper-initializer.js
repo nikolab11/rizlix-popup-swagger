@@ -4,7 +4,7 @@ window.onload = function() {
   window["SwaggerUIStandalonePreset"] = window["swagger-ui-standalone-preset"]
   // Build a system
   const ui = SwaggerUIBundle({
-    url: "https://petstore.swagger.io/v2/swagger.json",
+    url: "https://gist.githubusercontent.com/nikolab11/e5cd83d5725823065dab3e6df8348bc7/raw/483b78474836d72181a887d31c9a504b5b0c1b49/rizlix-popup.yaml",
     dom_id: "#swagger-ui",
     presets: [
       SwaggerUIBundle.presets.apis,

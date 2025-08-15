@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: Booking API (Popup Flow)
+  version: "1.0.0"
+  description: >
+    All endpoints are POST and use JSON. `code` is a unique clinic identifier.
+servers:
+  - url: https://api.example.com
+tags:
+  - name: Scheduling
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /init:
+    post:
+      tags: [Scheduling]
+      summary: Get the list of steps to display in the booking popup.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InitRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InitResponse"
+              examples:
+                example:
+                  value:
+                    steps: ["location","service","employee","calendar","user info","payment"]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /location:
+    post:
+      tags: [Scheduling]
+      summary: Get available clinic locations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+              examples:
+                example:
+                  value:
+                    - id: 1
+                      name: "Amsterdam Center"
+                      address: "Herengracht 123"
+                      city: "Amsterdam"
+                      postalCode: "1015"
+                      country: "NL"
+                      mapInformation:
+                        latitude: 52.3727598
+                        longitude: 4.8936041
+                    - id: 2
+                      name: "South Clinic"
+                      address: "Van Woustraat 45"
+                      city: "Amsterdam"
+                      postalCode: "1074"
+                      country: "NL"
+                      mapInformation:
+                        latitude: 52.3500001
+                        longitude: 4.9000002
+
+  /service:
+    post:
+      tags: [Scheduling]
+      summary: Get service categories and services for a selected location.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+                  locationId: 1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ServiceCategory"
+              examples:
+                example:
+                  value:
+                    - id: 10
+                      name: "Fertility"
+                      services:
+                        - id: 100
+                          name: "Intrauterine Insemination (IUI)"
+                          description: "IUI procedure in a natural cycle"
+                          duration: 30
+                          price: 120.0
+                          currency: "EUR"
+                        - id: 101
+                          name: "Ultrasound Exam"
+                          description: "Follow-up ultrasound"
+                          duration: 20
+                          price: 60.0
+                          currency: "EUR"
+                    - id: 11
+                      name: "Laboratory"
+                      services:
+                        - id: 102
+                          name: "Blood Test"
+                          description: "Basic panel"
+                          duration: 15
+                          price: 25.0
+                          currency: "EUR"
+
+  /employee:
+    post:
+      tags: [Scheduling]
+      summary: Get employees for a selected location and service.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+                  locationId: 1
+                  serviceId: 100
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+              examples:
+                example:
+                  value:
+                    - id: 501
+                      name: "Dr. Anna Janssen"
+                      description: "Specialist in gynecology and obstetrics"
+                    - id: 502
+                      name: "Dr. Mark de Vries"
+                      description: "Specialist in reproductive medicine"
+
+  /calendar:
+    post:
+      tags: [Scheduling]
+      summary: Get available time slots (passthrough from PracticeHub).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalendarRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+                  locationId: 1
+                  serviceId: 100
+                  employeeId: 501
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalendarResponse"
+              examples:
+                example:
+                  value:
+                    provider: "practicehub"
+                    data:
+                      slots:
+                        - start: "2025-08-16T09:00:00Z"
+                          end: "2025-08-16T09:30:00Z"
+                          available: true
+                        - start: "2025-08-16T10:00:00Z"
+                          end: "2025-08-16T10:30:00Z"
+                          available: false
+
+  /payment:
+    post:
+      tags: [Scheduling]
+      summary: Re-reserve a slot in PracticeHub and process payment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+            examples:
+              example:
+                value:
+                  code: "CLN-AMS-001"
+                  locationId: 1
+                  serviceId: 100
+                  employeeId: 501
+                  date: "2025-08-16T09:00:00Z"
+                  userData:
+                    firstName: "Jane"
+                    lastName: "Doe"
+                    email: "jane.doe@example.com"
+                    phone: "+31612345678"
+                    notes: "Prefers morning appointments"
+                  idempotencyKey: "pmt_2c4b2b74-7d6e-43b4-b7e9-4d9854a1f2a1"
+      responses:
+        "200":
+          description: Payment result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/PaymentSuccess"
+                  - $ref: "#/components/schemas/PaymentFailure"
+              examples:
+                success:
+                  value:
+                    success: true
+                    reservationId: 9001
+                    paymentReference: "CH_9b1f8bd8e2"
+                failure:
+                  value:
+                    success: false
+                    error:
+                      code: "PAYMENT_FAILED"
+                      message: "Card declined"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+      description: >
+        API key required for all requests.
+        Example:
+        X-API-KEY: your-secret-key
