@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swagger UI</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.27.1/swagger-ui.css" />
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    
+    <script src="https://unpkg.com/swagger-ui-dist@5.27.1/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.27.1/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+    
+    <script>
+        window.onload = function() {
+            window.ui = SwaggerUIBundle({
+                url: "https://gist.githubusercontent.com/nikolab11/e5cd83d5725823065dab3e6df8348bc7/raw/483b78474836d72181a887d31c9a504b5b0c1b49/rizlix-popup.yaml",
+                dom_id: "#swagger-ui",
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+
+            ui.initOAuth({
+                clientId: "your-client-id",
+                clientSecret: "your-client-secret-if-required",
+                realm: "your-realms",
+                appName: "your-app-name",
+                scopeSeparator: " ",
+                scopes: "openid profile email phone address",
+                additionalQueryStringParams: {},
+                useBasicAuthenticationWithAccessCodeGrant: false,
+                usePkceWithAuthorizationCodeGrant: false
+            });
+        };
+    </script>
+</body>
+</html>
