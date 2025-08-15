@@ -10,7 +10,8 @@
   border: 2px solid $color-delete;
   border-radius: 4px;
   background: rgba($color-delete, 0.1);
-
+  display: none;
+  
   .error-wrapper {
     margin: 0 0 10px 0;
   }

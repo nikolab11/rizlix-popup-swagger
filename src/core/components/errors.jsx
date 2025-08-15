@@ -35,6 +35,8 @@ export default class Errors extends React.Component {
 
     let sortedJSErrors = allErrorsToDisplay.sortBy(err => err.get("line"))
 
+    return null;
+
     return (
       <pre className="errors-wrapper">
         <hgroup className="error">
